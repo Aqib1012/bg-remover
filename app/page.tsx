@@ -81,240 +81,287 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen">
-      {/* Nav */}
-      <header className="border-b border-white/10">
-        <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-teal" />
-            <span className="font-display text-lg tracking-tight">BGCut</span>
+    <main className="min-h-screen relative">
+      {/* Animated background blobs */}
+      <div className="blob-field">
+        <div className="blob blob-1" />
+        <div className="blob blob-2" />
+        <div className="blob blob-3" />
+      </div>
+
+      <div className="relative z-10">
+        {/* Nav */}
+        <header className="border-b border-border/70 backdrop-blur-sm">
+          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="w-3 h-3 rounded-full bg-teal pulse-ring" />
+              <span className="font-display text-lg tracking-tight text-ink">
+                BGCut
+              </span>
+            </div>
+            <p className="text-sm text-inkSoft hidden sm:block">
+              Free, no signup, processed on your device
+            </p>
           </div>
-          <p className="text-sm text-paper/50 hidden sm:block">
-            Free · No signup · Processed on your device
-          </p>
-        </div>
-      </header>
+        </header>
 
-      {/* AD SLOT: top banner — paste AdSterra banner code here */}
-      <div className="max-w-5xl mx-auto px-6 pt-6" id="ad-slot-top" />
+        {/* AD SLOT: top banner — paste AdSterra banner code here */}
+        <div className="max-w-5xl mx-auto px-6 pt-6" id="ad-slot-top" />
 
-      {/* Hero + Tool */}
-      <section className="max-w-5xl mx-auto px-6 pt-10 pb-16">
-        <div className="max-w-2xl mb-8">
-          <h1 className="font-display text-4xl sm:text-5xl leading-[1.1] mb-4">
-            Cut the background out of any photo,{" "}
-            <em className="not-italic text-tealLight">right in your browser</em>.
-          </h1>
-          <p className="text-paper/60 text-lg leading-relaxed">
-            Drop a photo below. Nothing gets uploaded to a server — the whole
-            thing runs locally on your device, so it's private and instant.
-          </p>
-        </div>
+        {/* Hero + Tool */}
+        <section className="max-w-5xl mx-auto px-6 pt-10 pb-16">
+          <div className="max-w-2xl mb-8">
+            <span className="inline-block px-3 py-1 rounded-full bg-tealSoft text-tealDeep text-xs font-medium mb-4">
+              100% free, forever
+            </span>
+            <h1 className="font-display text-4xl sm:text-5xl leading-[1.1] mb-4 text-ink">
+              Cut the background out of any photo,{" "}
+              <span className="text-teal">right in your browser</span>.
+            </h1>
+            <p className="text-inkSoft text-lg leading-relaxed">
+              Drop a photo below. Nothing gets uploaded to a server, the
+              whole thing runs locally on your device, so it is private and
+              instant.
+            </p>
+          </div>
 
-        {/* Tool card */}
-        <div className="grain rounded-2xl border border-white/10 bg-charcoal2 p-6 sm:p-8">
-          {status === "idle" && (
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={onDrop}
-              onClick={() => inputRef.current?.click()}
-              className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-colors duration-200 flex flex-col items-center justify-center text-center py-20 px-6 ${
-                isDragging
-                  ? "border-teal bg-teal/5"
-                  : "border-white/15 hover:border-white/30"
-              }`}
-            >
-              <input
-                ref={inputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={onFileSelect}
-              />
-              <UploadIcon />
-              <p className="mt-4 font-medium text-paper/90">
-                Drag a photo here, or click to browse
-              </p>
-              <p className="mt-1.5 text-sm text-paper/40">
-                JPG, PNG, or WebP · Processed entirely on your device
-              </p>
-            </div>
-          )}
-
-          {(status === "loading-model" || status === "processing") && (
-            <div className="py-20 flex flex-col items-center justify-center text-center">
-              <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/15 mb-5">
-                {originalUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={originalUrl}
-                    alt=""
-                    className="w-full h-full object-cover opacity-40"
-                  />
-                )}
-                <div className="absolute inset-x-0 h-1 bg-tealLight/80 scan-line shadow-[0_0_12px_2px_rgba(127,184,173,0.6)]" />
-              </div>
-              <p className="font-medium text-paper/90">
-                {status === "loading-model"
-                  ? "Loading the model — first time only, takes a moment"
-                  : "Lifting the subject off the background…"}
-              </p>
-              <p className="mt-1.5 text-sm text-paper/40">
-                This happens on your device, not on a server.
-              </p>
-            </div>
-          )}
-
-          {status === "error" && (
-            <div className="py-16 flex flex-col items-center justify-center text-center">
-              <p className="font-medium text-rust mb-2">{errorMsg}</p>
-              <button
-                onClick={reset}
-                className="mt-3 px-5 py-2.5 rounded-lg bg-teal text-charcoal font-medium hover:bg-tealLight transition-colors"
-              >
-                Try another photo
-              </button>
-            </div>
-          )}
-
-          {status === "done" && originalUrl && resultUrl && (
-            <div className="fade-up">
+          {/* Tool card */}
+          <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl shadow-teal/5">
+            {status === "idle" && (
               <div
-                className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto"
-                style={{ maxWidth: 560 }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={onDrop}
+                onClick={() => inputRef.current?.click()}
+                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center text-center py-20 px-6 ${
+                  isDragging
+                    ? "border-teal bg-tealSoft scale-[1.01]"
+                    : "border-border hover:border-teal/50 hover:bg-tealSoft/40"
+                }`}
               >
-                <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={resultUrl}
-                    alt="Background removed"
-                    className="absolute inset-0 w-full h-full object-contain"
-                    style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-                  />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={originalUrl}
-                    alt="Original"
-                    className="absolute inset-0 w-full h-full object-contain"
-                    style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
-                  />
-                  <div
-                    className="absolute inset-y-0 w-0.5 bg-paper/80"
-                    style={{ left: `${sliderPos}%` }}
-                  >
-                    <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-paper flex items-center justify-center text-charcoal text-xs">
-                      ↔
+                <input
+                  ref={inputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={onFileSelect}
+                />
+                <div className="bounce-soft">
+                  <UploadIcon />
+                </div>
+                <p className="mt-4 font-medium text-ink text-lg">
+                  Drag a photo here, or click to browse
+                </p>
+                <p className="mt-1.5 text-sm text-inkSoft">
+                  JPG, PNG, or WebP, processed entirely on your device
+                </p>
+              </div>
+            )}
+
+            {(status === "loading-model" || status === "processing") && (
+              <div className="py-16 flex flex-col items-center justify-center text-center pop-in">
+                <div className="relative w-20 h-20 mb-6">
+                  {originalUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={originalUrl}
+                      alt=""
+                      className="w-full h-full object-cover opacity-30 rounded-2xl"
+                    />
+                  )}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="spin-slow w-12 h-12">
+                      <ScissorsIcon />
                     </div>
                   </div>
                 </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={sliderPos}
-                  onChange={(e) => setSliderPos(Number(e.target.value))}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
-                  aria-label="Compare original and result"
-                />
+                <p className="font-semibold text-ink text-lg">
+                  {status === "loading-model"
+                    ? "Loading the model, first time only"
+                    : "Lifting the subject off the background"}
+                </p>
+                <p className="mt-1.5 text-sm text-inkSoft mb-6">
+                  This happens on your device, not on a server.
+                </p>
+                <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
+                  <div className="absolute inset-y-0 left-0 w-1/3 rounded-full bg-teal progress-bar-fill" />
+                </div>
               </div>
+            )}
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
-                <button
-                  onClick={download}
-                  className="px-6 py-3 rounded-lg bg-teal text-charcoal font-medium hover:bg-tealLight transition-colors w-full sm:w-auto"
-                >
-                  Download PNG
-                </button>
+            {status === "error" && (
+              <div className="py-16 flex flex-col items-center justify-center text-center pop-in">
+                <div className="w-14 h-14 rounded-full bg-coralSoft flex items-center justify-center mb-4">
+                  <span className="text-2xl">!</span>
+                </div>
+                <p className="font-medium text-ink mb-2">{errorMsg}</p>
                 <button
                   onClick={reset}
-                  className="px-6 py-3 rounded-lg border border-white/15 text-paper/80 hover:bg-white/5 transition-colors w-full sm:w-auto"
+                  className="mt-3 px-5 py-2.5 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep transition-colors"
                 >
                   Try another photo
                 </button>
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            )}
 
-      {/* AD SLOT: mid-page banner — paste AdSterra code here */}
-      <div className="max-w-5xl mx-auto px-6" id="ad-slot-mid" />
+            {status === "done" && originalUrl && resultUrl && (
+              <div className="pop-in">
+                <div
+                  className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
+                  style={{ maxWidth: 560 }}
+                >
+                  <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={resultUrl}
+                      alt="Background removed"
+                      className="absolute inset-0 w-full h-full object-contain"
+                      style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={originalUrl}
+                      alt="Original"
+                      className="absolute inset-0 w-full h-full object-contain"
+                      style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                    />
+                    <div
+                      className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
+                      style={{ left: `${sliderPos}%` }}
+                    >
+                      <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
+                        ↔
+                      </div>
+                    </div>
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-teal shadow">
+                      After
+                    </span>
+                    <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-inkSoft shadow">
+                      Before
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={sliderPos}
+                    onChange={(e) => setSliderPos(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
+                    aria-label="Compare original and result"
+                  />
+                </div>
 
-      {/* Info / SEO content */}
-      <section className="max-w-5xl mx-auto px-6 py-16 border-t border-white/10">
-        <div className="grid sm:grid-cols-3 gap-8 mb-16">
-          <Feature
-            title="Private by design"
-            body="Your photo never leaves your device. There's no server upload, so there's nothing to store or leak."
-          />
-          <Feature
-            title="No account needed"
-            body="No sign-up, no email, no watermark. Drop a photo and get a transparent PNG back."
-          />
-          <Feature
-            title="Works on any photo"
-            body="Portraits, products, pets, logos — the model handles most subjects without manual masking."
-          />
-        </div>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+                  <button
+                    onClick={download}
+                    className="px-6 py-3 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep hover:-translate-y-0.5 transition-all shadow-md shadow-teal/20 w-full sm:w-auto"
+                  >
+                    Download PNG
+                  </button>
+                  <button
+                    onClick={reset}
+                    className="px-6 py-3 rounded-lg border border-border text-ink hover:bg-tealSoft/50 transition-colors w-full sm:w-auto"
+                  >
+                    Try another photo
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
 
-        <div className="max-w-2xl">
-          <h2 className="font-display text-2xl mb-4">
-            How to remove a background from a photo
-          </h2>
-          <ol className="space-y-3 text-paper/60 leading-relaxed list-decimal list-inside">
-            <li>Drag your photo into the box above, or click to choose a file.</li>
-            <li>
-              Wait a few seconds while the tool identifies the subject and
-              removes everything behind it.
-            </li>
-            <li>
-              Drag the slider to compare before and after, then download the
-              result as a transparent PNG.
-            </li>
-          </ol>
-        </div>
+        {/* AD SLOT: mid-page banner — paste AdSterra code here */}
+        <div className="max-w-5xl mx-auto px-6" id="ad-slot-mid" />
 
-        <div className="max-w-2xl mt-12">
-          <h2 className="font-display text-2xl mb-4">Frequently asked questions</h2>
-          <div className="space-y-6">
-            <FAQ
-              q="Is this actually free?"
-              a="Yes. There's no limit on how many images you can process, and no watermark on the result."
+        {/* Info / SEO content */}
+        <section className="max-w-5xl mx-auto px-6 py-16 border-t border-border">
+          <div className="grid sm:grid-cols-3 gap-6 mb-16">
+            <Feature
+              icon="🔒"
+              title="Private by design"
+              body="Your photo never leaves your device. There's no server upload, so there's nothing to store or leak."
             />
-            <FAQ
-              q="Where does the processing happen?"
-              a="Entirely in your browser, using a small on-device model. Your image is never sent to a server."
+            <Feature
+              icon="⚡"
+              title="No account needed"
+              body="No sign-up, no email, no watermark. Drop a photo and get a transparent PNG back."
             />
-            <FAQ
-              q="What file formats are supported?"
-              a="You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG."
+            <Feature
+              icon="✨"
+              title="Works on any photo"
+              body="Portraits, products, pets, logos, the model handles most subjects without manual masking."
             />
           </div>
-        </div>
-      </section>
 
-      {/* AD SLOT: bottom banner — paste AdSterra code here */}
-      <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
+          <div className="max-w-2xl">
+            <h2 className="font-display text-2xl mb-4 text-ink">
+              How to remove a background from a photo
+            </h2>
+            <ol className="space-y-3 text-inkSoft leading-relaxed list-decimal list-inside">
+              <li>Drag your photo into the box above, or click to choose a file.</li>
+              <li>
+                Wait a few seconds while the tool identifies the subject and
+                removes everything behind it.
+              </li>
+              <li>
+                Drag the slider to compare before and after, then download the
+                result as a transparent PNG.
+              </li>
+            </ol>
+          </div>
 
-      <footer className="border-t border-white/10 py-8">
-        <div className="max-w-5xl mx-auto px-6 text-sm text-paper/40">
-          BGCut — a free tool, built with a browser-based ML model. No images
-          are stored or uploaded.
-        </div>
-      </footer>
+          <div className="max-w-2xl mt-12">
+            <h2 className="font-display text-2xl mb-4 text-ink">
+              Frequently asked questions
+            </h2>
+            <div className="space-y-6">
+              <FAQ
+                q="Is this actually free?"
+                a="Yes. There's no limit on how many images you can process, and no watermark on the result."
+              />
+              <FAQ
+                q="Where does the processing happen?"
+                a="Entirely in your browser, using a small on-device model. Your image is never sent to a server."
+              />
+              <FAQ
+                q="What file formats are supported?"
+                a="You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG."
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* AD SLOT: bottom banner — paste AdSterra code here */}
+        <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
+
+        <footer className="border-t border-border py-8">
+          <div className="max-w-5xl mx-auto px-6 text-sm text-inkSoft">
+            BGCut, a free tool built with a browser-based ML model. No images
+            are stored or uploaded.
+          </div>
+        </footer>
+      </div>
     </main>
   );
 }
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({
+  icon,
+  title,
+  body,
+}: {
+  icon: string;
+  title: string;
+  body: string;
+}) {
   return (
-    <div>
-      <h3 className="font-medium text-paper/90 mb-1.5">{title}</h3>
-      <p className="text-sm text-paper/50 leading-relaxed">{body}</p>
+    <div className="p-5 rounded-xl bg-card border border-border hover:shadow-md hover:-translate-y-0.5 transition-all">
+      <div className="text-2xl mb-2">{icon}</div>
+      <h3 className="font-medium text-ink mb-1.5">{title}</h3>
+      <p className="text-sm text-inkSoft leading-relaxed">{body}</p>
     </div>
   );
 }
@@ -322,8 +369,8 @@ function Feature({ title, body }: { title: string; body: string }) {
 function FAQ({ q, a }: { q: string; a: string }) {
   return (
     <div>
-      <p className="font-medium text-paper/90 mb-1">{q}</p>
-      <p className="text-sm text-paper/50 leading-relaxed">{a}</p>
+      <p className="font-medium text-ink mb-1">{q}</p>
+      <p className="text-sm text-inkSoft leading-relaxed">{a}</p>
     </div>
   );
 }
@@ -331,13 +378,13 @@ function FAQ({ q, a }: { q: string; a: string }) {
 function UploadIcon() {
   return (
     <svg
-      width="40"
-      height="40"
+      width="48"
+      height="48"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
-      className="text-paper/40"
+      className="text-teal"
     >
       <path
         d="M12 16V4M12 4L7 9M12 4l5 5"
@@ -349,6 +396,25 @@ function UploadIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+function ScissorsIcon() {
+  return (
+    <svg
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className="text-teal"
+    >
+      <circle cx="6" cy="6" r="2.5" />
+      <circle cx="6" cy="18" r="2.5" />
+      <path d="M8.5 7.5L19 18" strokeLinecap="round" />
+      <path d="M8.5 16.5L19 6" strokeLinecap="round" />
     </svg>
   );
 }
