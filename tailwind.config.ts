@@ -5,13 +5,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        charcoal: "#1C1B19",
-        charcoal2: "#26241F",
-        paper: "#F7F5F0",
-        teal: "#4F8C82",
-        tealLight: "#7FB8AD",
-        amber: "#D9A441",
-        rust: "#B85C38",
+        cream: "#FBF8F2",
+        card: "#FFFFFF",
+        ink: "#211F1C",
+        inkSoft: "#5A564E",
+        border: "#EAE3D6",
+        teal: "#1F9E8E",
+        tealDeep: "#157A6D",
+        tealSoft: "#E4F6F2",
+        coral: "#F4794E",
+        coralSoft: "#FDE9E0",
+        amber: "#E8A93C",
       },
       fontFamily: {
         display: ["var(--font-fraunces)", "serif"],
