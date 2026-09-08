@@ -31,7 +31,10 @@ export default function Home() {
     try {
       const { removeBackground } = await import("@imgly/background-removal");
       setStatus("processing");
-      const blob = await removeBackground(file, { publicPath: "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/", });
+      const blob = await removeBackground(file, {
+        publicPath:
+          "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
+      });
       const outUrl = URL.createObjectURL(blob);
       setResultUrl(outUrl);
       setStatus("done");
@@ -187,22 +190,18 @@ export default function Home() {
                 <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
+                    src={resultUrl}
+                    alt="Background removed"
+                    className="absolute inset-0 w-full h-full object-contain"
+                    style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={originalUrl}
                     alt="Original"
                     className="absolute inset-0 w-full h-full object-contain"
+                    style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
                   />
-                  <div
-                    className="absolute inset-0 overflow-hidden"
-                    style={{ width: `${sliderPos}%` }}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={resultUrl}
-                      alt="Background removed"
-                      className="absolute inset-0 h-full object-contain"
-                      style={{ width: "100vw", maxWidth: 560 }}
-                    />
-                  </div>
                   <div
                     className="absolute inset-y-0 w-0.5 bg-paper/80"
                     style={{ left: `${sliderPos}%` }}
