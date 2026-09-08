@@ -107,6 +107,30 @@ export default function RootLayout({
                     text: "You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG.",
                   },
                 },
+                {
+                  "@type": "Question",
+                  name: "Is there a limit on image size?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "No hard limit, but very large images (4000x4000 pixels or more) may process slowly since everything runs on your device instead of a server.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Does this work on mobile phones?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Yes, BGCut works on any modern browser, including mobile Chrome and Safari. Processing time may be slightly longer on older phones.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Can I use the result for commercial projects?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Yes, the processed images are yours to use however you like, including commercial and business purposes.",
+                  },
+                },
               ],
             }),
           }}
