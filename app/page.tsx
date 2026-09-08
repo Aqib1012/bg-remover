@@ -336,6 +336,18 @@ export default function Home() {
                 q="What file formats are supported?"
                 a="You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG."
               />
+              <FAQ
+                q="Is there a limit on image size?"
+                a="No hard limit, but very large images (4000x4000 pixels or more) may process slowly since everything runs on your device instead of a server."
+              />
+              <FAQ
+                q="Does this work on mobile phones?"
+                a="Yes, BGCut works on any modern browser, including mobile Chrome and Safari. Processing time may be slightly longer on older phones."
+              />
+              <FAQ
+                q="Can I use the result for commercial projects?"
+                a="Yes, the processed images are yours to use however you like, including commercial and business purposes."
+              />
             </div>
           </div>
         </section>
