@@ -92,7 +92,7 @@ export default function Home() {
       <div className="relative z-10">
         {/* Nav */}
         <header className="border-b border-border/70 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
+          <div className="max-w-5xl mx-auto px-6 py-3.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-teal pulse-ring" />
               <span className="font-display text-lg tracking-tight text-ink">
@@ -106,19 +106,19 @@ export default function Home() {
         </header>
 
         {/* AD SLOT: top banner — paste AdSterra banner code here */}
-        <div className="max-w-5xl mx-auto px-6 pt-6" id="ad-slot-top" />
+        <div className="max-w-5xl mx-auto px-6 pt-3" id="ad-slot-top" />
 
         {/* Hero + Tool */}
-        <section className="max-w-5xl mx-auto px-6 pt-10 pb-16">
-          <div className="max-w-2xl mb-8">
-            <span className="inline-block px-3 py-1 rounded-full bg-tealSoft text-tealDeep text-xs font-medium mb-4">
+        <section className="max-w-5xl mx-auto px-6 pt-6 pb-16">
+          <div className="max-w-2xl mb-5">
+            <span className="inline-block px-3 py-1 rounded-full bg-tealSoft text-tealDeep text-xs font-medium mb-3">
               100% free, forever
             </span>
-            <h1 className="font-display text-4xl sm:text-5xl leading-[1.1] mb-4 text-ink">
+            <h1 className="font-display text-3xl sm:text-4xl leading-[1.15] mb-3 text-ink">
               Cut the background out of any photo,{" "}
               <span className="text-teal">right in your browser</span>.
             </h1>
-            <p className="text-inkSoft text-lg leading-relaxed">
+            <p className="text-inkSoft text-base leading-relaxed">
               Drop a photo below. Nothing gets uploaded to a server, the
               whole thing runs locally on your device, so it is private and
               instant.
@@ -136,7 +136,7 @@ export default function Home() {
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={onDrop}
                 onClick={() => inputRef.current?.click()}
-                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center text-center py-20 px-6 ${
+                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center text-center py-12 px-6 ${
                   isDragging
                     ? "border-teal bg-tealSoft scale-[1.01]"
                     : "border-border hover:border-teal/50 hover:bg-tealSoft/40"
@@ -152,10 +152,10 @@ export default function Home() {
                 <div className="bounce-soft">
                   <UploadIcon />
                 </div>
-                <p className="mt-4 font-medium text-ink text-lg">
+                <p className="mt-3 font-medium text-ink text-lg">
                   Drag a photo here, or click to browse
                 </p>
-                <p className="mt-1.5 text-sm text-inkSoft">
+                <p className="mt-1 text-sm text-inkSoft">
                   JPG, PNG, or WebP, processed entirely on your device
                 </p>
               </div>
