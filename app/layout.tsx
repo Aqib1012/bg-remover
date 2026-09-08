@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://your-domain.vercel.app"),
+  metadataBase: new URL("https://yourbgcut.vercel.app"),
   title: "Free Background Remover — Remove Image Background Instantly | BGCut",
   description:
     "Remove the background from any photo in seconds, free, no signup. Runs entirely in your browser — nothing is uploaded to a server. Download as transparent PNG.",
@@ -43,6 +43,9 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  verification: {
+    google: "GwOndkKHNQezvi4J0wVauPe2pyBCbY57xA3VwIFhsT0",
   },
 };
 
