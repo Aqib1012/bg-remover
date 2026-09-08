@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import NativeBanner from "./NativeBanner";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
 
@@ -276,8 +277,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AD SLOT: mid-page banner — paste AdSterra code here */}
-        <div className="max-w-5xl mx-auto px-6" id="ad-slot-mid" />
+        {/* AD SLOT: mid-page banner */}
+        <div className="max-w-5xl mx-auto px-6">
+          <NativeBanner />
+        </div>
 
         {/* Info / SEO content */}
         <section className="max-w-5xl mx-auto px-6 py-16 border-t border-border">
