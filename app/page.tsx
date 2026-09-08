@@ -31,7 +31,7 @@ export default function Home() {
     try {
       const { removeBackground } = await import("@imgly/background-removal");
       setStatus("processing");
-      const blob = await removeBackground(file);
+      const blob = await removeBackground(file, { publicPath: "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/", });
       const outUrl = URL.createObjectURL(blob);
       setResultUrl(outUrl);
       setStatus("done");
