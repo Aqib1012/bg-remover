@@ -63,7 +63,7 @@ export default function RootLayout({
              designated slots inside app/page.tsx (marked with comments).
         */}
       </head>
-      <body className="font-body bg-charcoal text-paper antialiased">
+      <body className="font-body bg-cream text-ink antialiased">
         {children}
       </body>
     </html>
