@@ -57,14 +57,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
       <head>
-        {/*
-          ADSTERRA SETUP:
-          1. Sign up at adsterra.com, add this site, get your ad codes.
-          2. Paste your AdSterra <script> tags here in <head>, or right
-             before </body>, exactly as AdSterra gives them to you.
-          3. For banner ad units, drop the AdSterra <script> in the
-             designated slots inside app/page.tsx (marked with comments).
-        */}
+        <script
+          src="https://pl31239782.profitableratecpmnetwork.com/e6/4c/a3/e64ca31462cdd91c897f8763892b964e.js"
+          async
+        ></script>
       </head>
       <body className="font-body bg-cream text-ink antialiased">
         {children}
