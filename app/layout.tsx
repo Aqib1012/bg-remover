@@ -1,20 +1,17 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
-
 const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
 });
-
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   weight: ["400", "500", "600", "700"],
 });
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://yourbgcut.vercel.app"),
   title: "Free Background Remover — Remove Image Background Instantly | BGCut",
@@ -48,7 +45,6 @@ export const metadata: Metadata = {
     google: "GwOndkKHNQezvi4J0wVauPe2pyBCbY57xA3VwIFhsT0",
   },
 };
-
 export default function RootLayout({
   children,
 }: {
@@ -61,6 +57,60 @@ export default function RootLayout({
           src="https://pl31239782.profitableratecpmnetwork.com/e6/4c/a3/e64ca31462cdd91c897f8763892b964e.js"
           async
         ></script>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "BGCut",
+              applicationCategory: "PhotographyApplication",
+              operatingSystem: "Any (runs in browser)",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "USD",
+              },
+              description:
+                "Free background remover that runs entirely in your browser. No signup, no upload to server, processes images on-device.",
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: [
+                {
+                  "@type": "Question",
+                  name: "Is this actually free?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Yes. There's no limit on how many images you can process, and no watermark on the result.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Where does the processing happen?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Entirely in your browser, using a small on-device model. Your image is never sent to a server.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "What file formats are supported?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG.",
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className="font-body bg-cream text-ink antialiased">
         {children}
