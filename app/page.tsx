@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
 import NativeBanner from "./NativeBanner";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
@@ -94,7 +95,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        {/* Nav */}
+               {/* Nav */}
         <header className="border-b border-border/70 backdrop-blur-sm">
           <div className="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -103,9 +104,17 @@ export default function Home() {
                 BGCut
               </span>
             </div>
-            <p className="text-sm text-inkSoft hidden sm:block">
-              Free, no signup, processed on your device
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-inkSoft hidden sm:block">
+                Free, no signup, processed on your device
+              </p>
+              <Link
+                href="/blog"
+                className="text-sm font-medium text-teal hover:underline"
+              >
+                Blog
+              </Link>
+            </div>
           </div>
         </header>
 
