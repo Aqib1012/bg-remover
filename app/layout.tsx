@@ -25,6 +25,9 @@ export const metadata: Metadata = {
     "remove bg online free",
     "image background eraser",
   ],
+  alternates: {
+    canonical: "https://yourbgcut.vercel.app",
+  },
   openGraph: {
     title: "Free Background Remover — Instant, Private, No Signup",
     description:
