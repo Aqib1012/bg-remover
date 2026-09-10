@@ -367,7 +367,7 @@ export default function Home() {
         {/* AD SLOT: bottom banner — paste AdSterra code here */}
         <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
 
-                <footer className="border-t border-border py-8">
+        <footer className="border-t border-border py-8">
           <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-inkSoft">
             <p>
               BGCut, a free tool built with a browser-based ML model. No
