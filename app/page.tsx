@@ -1,11 +1,47 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import NativeBanner from "./NativeBanner";
 import Logo from "./Logo";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
+
+const MAX_DIMENSION = 1600;
+
+function resizeImage(file: File): Promise<File> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const { width, height } = img;
+      if (width <= MAX_DIMENSION && height <= MAX_DIMENSION) {
+        URL.revokeObjectURL(url);
+        resolve(file);
+        return;
+      }
+      const scale = MAX_DIMENSION / Math.max(width, height);
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(width * scale);
+      canvas.height = Math.round(height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (blob) {
+            resolve(new File([blob], file.name, { type: "image/jpeg" }));
+          } else {
+            resolve(file);
+          }
+        },
+        "image/jpeg",
+        0.92
+      );
+    };
+    img.src = url;
+  });
+}
 
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
@@ -16,6 +52,15 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const modelReady = useRef(false);
+
+  // Warm up the model in the background as soon as the page loads,
+  // so it's likely already cached by the time the user picks a photo.
+  useEffect(() => {
+    import("@imgly/background-removal").then(() => {
+      modelReady.current = true;
+    });
+  }, []);
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -29,17 +74,19 @@ export default function Home() {
     setOriginalUrl(localUrl);
     setResultUrl(null);
     setErrorMsg("");
-    setStatus("loading-model");
+    setStatus(modelReady.current ? "processing" : "loading-model");
 
     try {
+      const resized = await resizeImage(file);
       const { removeBackground } = await import("@imgly/background-removal");
+      modelReady.current = true;
       setStatus("processing");
-      const blob = await removeBackground(file, {
+      const blob = await removeBackground(resized, {
         publicPath:
           "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
         model: "isnet_quint8",
         device: "gpu",
-        output: { quality: 0.8 },
+        output: { quality: 0.75 },
       });
       const outUrl = URL.createObjectURL(blob);
       setResultUrl(outUrl);
@@ -343,7 +390,7 @@ export default function Home() {
               />
               <FAQ
                 q="Is there a limit on image size?"
-                a="No hard limit, but very large images (4000x4000 pixels or more) may process slowly since everything runs on your device instead of a server."
+                a="No hard limit. Large images are automatically resized before processing to keep things fast."
               />
               <FAQ
                 q="Does this work on mobile phones?"
