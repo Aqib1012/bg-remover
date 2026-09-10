@@ -88,7 +88,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen relative">
-      {/* Animated background blobs */}
       <div className="blob-field">
         <div className="blob blob-1" />
         <div className="blob blob-2" />
@@ -96,7 +95,6 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        {/* Nav */}
         <header className="border-b border-border/70 backdrop-blur-sm">
           <div className="max-w-5xl mx-auto px-6 py-2.5 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -121,10 +119,8 @@ export default function Home() {
           </div>
         </header>
 
-        {/* AD SLOT: top banner — paste AdSterra banner code here */}
         <div className="max-w-5xl mx-auto px-6 pt-2" id="ad-slot-top" />
 
-        {/* Hero + Tool */}
         <section className="max-w-5xl mx-auto px-6 pt-4 pb-16">
           <div className="max-w-2xl mb-4">
             <span className="inline-block px-3 py-1 rounded-full bg-tealSoft text-tealDeep text-xs font-medium mb-2">
@@ -141,7 +137,6 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Tool card */}
           <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 shadow-xl shadow-teal/5">
             {status === "idle" && (
               <div
@@ -289,12 +284,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AD SLOT: mid-page banner */}
         <div className="max-w-5xl mx-auto px-6">
           <NativeBanner />
         </div>
 
-        {/* Info / SEO content */}
         <section className="max-w-5xl mx-auto px-6 py-16 border-t border-border">
           <div className="grid sm:grid-cols-3 gap-6 mb-16">
             <Feature
@@ -364,7 +357,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AD SLOT: bottom banner — paste AdSterra code here */}
         <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
 
         <footer className="border-t border-border py-8">
