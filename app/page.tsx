@@ -373,11 +373,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="max-w-5xl mx-auto px-6 mt-6">
-            
-              href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut" target="_blank" rel="noopener noreferrer">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1312515&theme=light"
