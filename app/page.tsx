@@ -7,7 +7,7 @@ import Logo from "./Logo";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
 
-const MAX_DIMENSION = 1600;
+const MAX_DIMENSION = 1000;
 
 function resizeImage(file: File): Promise<File> {
   return new Promise((resolve) => {
@@ -51,11 +51,10 @@ export default function Home() {
   const [fileName, setFileName] = useState("image");
   const [errorMsg, setErrorMsg] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [progress, setProgress] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const modelReady = useRef(false);
 
-  // Warm up the model in the background as soon as the page loads,
-  // so it's likely already cached by the time the user picks a photo.
   useEffect(() => {
     import("@imgly/background-removal").then(() => {
       modelReady.current = true;
@@ -74,6 +73,7 @@ export default function Home() {
     setOriginalUrl(localUrl);
     setResultUrl(null);
     setErrorMsg("");
+    setProgress(0);
     setStatus(modelReady.current ? "processing" : "loading-model");
 
     try {
@@ -86,7 +86,13 @@ export default function Home() {
           "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
         model: "isnet_quint8",
         device: "gpu",
-        output: { quality: 0.75 },
+        output: { quality: 0.7, format: "image/webp" },
+        progress: (key, current, total) => {
+          if (total > 0) {
+            const pct = Math.round((current / total) * 100);
+            setProgress(pct);
+          }
+        },
       });
       const outUrl = URL.createObjectURL(blob);
       setResultUrl(outUrl);
@@ -123,13 +129,14 @@ export default function Home() {
     setOriginalUrl(null);
     setResultUrl(null);
     setErrorMsg("");
+    setProgress(0);
   };
 
   const download = () => {
     if (!resultUrl) return;
     const a = document.createElement("a");
     a.href = resultUrl;
-    a.download = `${fileName}-no-bg.png`;
+    a.download = `${fileName}-no-bg.webp`;
     a.click();
   };
 
@@ -245,8 +252,14 @@ export default function Home() {
                   This happens on your device, not on a server.
                 </p>
                 <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
-                  <div className="absolute inset-y-0 left-0 w-1/3 rounded-full bg-teal progress-bar-fill" />
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-full bg-teal transition-all duration-200"
+                    style={{ width: `${Math.max(progress, 8)}%` }}
+                  />
                 </div>
+                {progress > 0 && (
+                  <p className="text-xs text-inkSoft mt-2">{progress}%</p>
+                )}
               </div>
             )}
 
