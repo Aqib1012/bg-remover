@@ -1,3 +1,4 @@
+```tsx
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -6,42 +7,6 @@ import NativeBanner from "./NativeBanner";
 import Logo from "./Logo";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
-
-const MAX_DIMENSION = 1000;
-
-function resizeImage(file: File): Promise<File> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const { width, height } = img;
-      if (width <= MAX_DIMENSION && height <= MAX_DIMENSION) {
-        URL.revokeObjectURL(url);
-        resolve(file);
-        return;
-      }
-      const scale = MAX_DIMENSION / Math.max(width, height);
-      const canvas = document.createElement("canvas");
-      canvas.width = Math.round(width * scale);
-      canvas.height = Math.round(height * scale);
-      const ctx = canvas.getContext("2d");
-      ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob(
-        (blob) => {
-          URL.revokeObjectURL(url);
-          if (blob) {
-            resolve(new File([blob], file.name, { type: "image/jpeg" }));
-          } else {
-            resolve(file);
-          }
-        },
-        "image/jpeg",
-        0.92
-      );
-    };
-    img.src = url;
-  });
-}
 
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
@@ -52,6 +17,7 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const modelReady = useRef(false);
 
@@ -68,40 +34,67 @@ export default function Home() {
       return;
     }
 
+    // Clean up previous object URLs if needed
     setFileName(file.name.replace(/\.[^/.]+$/, ""));
+
+    // Use the ORIGINAL image directly
+    // No resizing or dimension limitation
     const localUrl = URL.createObjectURL(file);
+
     setOriginalUrl(localUrl);
     setResultUrl(null);
     setErrorMsg("");
     setProgress(0);
-    setStatus(modelReady.current ? "processing" : "loading-model");
+
+    setStatus(
+      modelReady.current ? "processing" : "loading-model"
+    );
 
     try {
-      const resized = await resizeImage(file);
-      const { removeBackground } = await import("@imgly/background-removal");
+      const { removeBackground } = await import(
+        "@imgly/background-removal"
+      );
+
       modelReady.current = true;
       setStatus("processing");
-      const blob = await removeBackground(resized, {
+
+      // Process original image without resizing
+      const blob = await removeBackground(file, {
         publicPath:
           "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
+
         model: "isnet_quint8",
+
+        // GPU processing when supported
         device: "gpu",
-        output: { quality: 0.7, format: "image/webp" },
+
+        output: {
+          quality: 0.7,
+          format: "image/webp",
+        },
+
         progress: (key, current, total) => {
           if (total > 0) {
-            const pct = Math.round((current / total) * 100);
+            const pct = Math.round(
+              (current / total) * 100
+            );
+
             setProgress(pct);
           }
         },
       });
+
       const outUrl = URL.createObjectURL(blob);
+
       setResultUrl(outUrl);
       setStatus("done");
     } catch (err) {
       console.error(err);
+
       setStatus("error");
+
       setErrorMsg(
-        "Couldn't process that image. Try a smaller file or a different photo."
+        "Couldn't process that image. Please try a different image or make sure your device has enough memory."
       );
     }
   }, []);
@@ -109,9 +102,14 @@ export default function Home() {
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
+
       setIsDragging(false);
+
       const file = e.dataTransfer.files?.[0];
-      if (file) processFile(file);
+
+      if (file) {
+        processFile(file);
+      }
     },
     [processFile]
   );
@@ -119,7 +117,10 @@ export default function Home() {
   const onFileSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) processFile(file);
+
+      if (file) {
+        processFile(file);
+      }
     },
     [processFile]
   );
@@ -130,13 +131,24 @@ export default function Home() {
     setResultUrl(null);
     setErrorMsg("");
     setProgress(0);
+
+    // Allow selecting the same file again
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   };
 
   const download = () => {
     if (!resultUrl) return;
+
     const a = document.createElement("a");
+
     a.href = resultUrl;
+
+    // Keeping original behavior
+    // Output is WebP because removeBackground returns WebP
     a.download = `${fileName}-no-bg.webp`;
+
     a.click();
   };
 
@@ -155,14 +167,17 @@ export default function Home() {
               <div className="pulse-ring rounded-lg">
                 <Logo />
               </div>
+
               <span className="font-display text-lg tracking-tight text-ink">
                 BGCut
               </span>
             </div>
+
             <div className="flex items-center gap-4">
               <p className="text-sm text-inkSoft hidden sm:block">
                 Free, no signup, processed on your device
               </p>
+
               <Link
                 href="/blog"
                 className="text-sm font-medium text-teal hover:underline"
@@ -173,21 +188,29 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="max-w-5xl mx-auto px-6 pt-2" id="ad-slot-top" />
+        <div
+          className="max-w-5xl mx-auto px-6 pt-2"
+          id="ad-slot-top"
+        />
 
         <section className="max-w-5xl mx-auto px-6 pt-4 pb-16">
           <div className="max-w-2xl mb-4">
             <span className="inline-block px-3 py-1 rounded-full bg-tealSoft text-tealDeep text-xs font-medium mb-2">
               100% free, forever
             </span>
+
             <h1 className="font-display text-2xl sm:text-3xl leading-[1.15] mb-2 text-ink">
               Cut the background out of any photo,{" "}
-              <span className="text-teal">right in your browser</span>.
+              <span className="text-teal">
+                right in your browser
+              </span>
+              .
             </h1>
+
             <p className="text-inkSoft text-sm leading-relaxed">
-              Drop a photo below. Nothing gets uploaded to a server, the
-              whole thing runs locally on your device, so it is private and
-              instant.
+              Drop a photo below. Nothing gets uploaded to a server,
+              the whole thing runs locally on your device, so it is
+              private and instant.
             </p>
           </div>
 
@@ -214,51 +237,63 @@ export default function Home() {
                   className="hidden"
                   onChange={onFileSelect}
                 />
+
                 <div className="bounce-soft">
                   <UploadIcon />
                 </div>
+
                 <p className="mt-3 font-medium text-ink text-lg">
                   Drag a photo here, or click to browse
                 </p>
+
                 <p className="mt-1 text-sm text-inkSoft">
-                  JPG, PNG, or WebP, processed entirely on your device
+                  JPG, PNG, or WebP • Original size supported
                 </p>
               </div>
             )}
 
-            {(status === "loading-model" || status === "processing") && (
+            {(status === "loading-model" ||
+              status === "processing") && (
               <div className="py-16 flex flex-col items-center justify-center text-center pop-in">
                 <div className="relative w-20 h-20 mb-6">
                   {originalUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={originalUrl}
                       alt=""
                       className="w-full h-full object-cover opacity-30 rounded-2xl"
                     />
                   )}
+
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="spin-slow w-12 h-12">
                       <ScissorsIcon />
                     </div>
                   </div>
                 </div>
+
                 <p className="font-semibold text-ink text-lg">
                   {status === "loading-model"
                     ? "Loading the model, first time only"
                     : "Lifting the subject off the background"}
                 </p>
+
                 <p className="mt-1.5 text-sm text-inkSoft mb-6">
-                  This happens on your device, not on a server.
+                  Processing the original image on your device.
                 </p>
+
                 <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
                   <div
                     className="absolute inset-y-0 left-0 rounded-full bg-teal transition-all duration-200"
-                    style={{ width: `${Math.max(progress, 8)}%` }}
+                    style={{
+                      width: `${Math.max(progress, 8)}%`,
+                    }}
                   />
                 </div>
+
                 {progress > 0 && (
-                  <p className="text-xs text-inkSoft mt-2">{progress}%</p>
+                  <p className="text-xs text-inkSoft mt-2">
+                    {progress}%
+                  </p>
                 )}
               </div>
             )}
@@ -268,7 +303,11 @@ export default function Home() {
                 <div className="w-14 h-14 rounded-full bg-coralSoft flex items-center justify-center mb-4">
                   <span className="text-2xl">!</span>
                 </div>
-                <p className="font-medium text-ink mb-2">{errorMsg}</p>
+
+                <p className="font-medium text-ink mb-2">
+                  {errorMsg}
+                </p>
+
                 <button
                   onClick={reset}
                   className="mt-3 px-5 py-2.5 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep transition-colors"
@@ -278,69 +317,88 @@ export default function Home() {
               </div>
             )}
 
-            {status === "done" && originalUrl && resultUrl && (
-              <div className="pop-in">
-                <div
-                  className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
-                  style={{ maxWidth: 560 }}
-                >
-                  <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={resultUrl}
-                      alt="Background removed"
-                      className="absolute inset-0 w-full h-full object-contain"
-                      style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
-                    />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={originalUrl}
-                      alt="Original"
-                      className="absolute inset-0 w-full h-full object-contain"
-                      style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
-                    />
+            {status === "done" &&
+              originalUrl &&
+              resultUrl && (
+                <div className="pop-in">
+                  <div
+                    className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
+                    style={{ maxWidth: 560 }}
+                  >
                     <div
-                      className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
-                      style={{ left: `${sliderPos}%` }}
+                      className="relative w-full"
+                      style={{ aspectRatio: "4/3" }}
                     >
-                      <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
-                        ↔
-                      </div>
-                    </div>
-                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-teal shadow">
-                      After
-                    </span>
-                    <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-inkSoft shadow">
-                      Before
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={sliderPos}
-                    onChange={(e) => setSliderPos(Number(e.target.value))}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
-                    aria-label="Compare original and result"
-                  />
-                </div>
+                      <img
+                        src={resultUrl}
+                        alt="Background removed"
+                        className="absolute inset-0 w-full h-full object-contain"
+                        style={{
+                          clipPath: `inset(0 ${
+                            100 - sliderPos
+                          }% 0 0)`,
+                        }}
+                      />
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
-                  <button
-                    onClick={download}
-                    className="px-6 py-3 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep hover:-translate-y-0.5 transition-all shadow-md shadow-teal/20 w-full sm:w-auto"
-                  >
-                    Download PNG
-                  </button>
-                  <button
-                    onClick={reset}
-                    className="px-6 py-3 rounded-lg border border-border text-ink hover:bg-tealSoft/50 transition-colors w-full sm:w-auto"
-                  >
-                    Try another photo
-                  </button>
+                      <img
+                        src={originalUrl}
+                        alt="Original"
+                        className="absolute inset-0 w-full h-full object-contain"
+                        style={{
+                          clipPath: `inset(0 0 0 ${sliderPos}%)`,
+                        }}
+                      />
+
+                      <div
+                        className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
+                        style={{
+                          left: `${sliderPos}%`,
+                        }}
+                      >
+                        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
+                          ↔
+                        </div>
+                      </div>
+
+                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-teal shadow">
+                        After
+                      </span>
+
+                      <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-inkSoft shadow">
+                        Before
+                      </span>
+                    </div>
+
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={sliderPos}
+                      onChange={(e) =>
+                        setSliderPos(Number(e.target.value))
+                      }
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
+                      aria-label="Compare original and result"
+                    />
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+                    <button
+                      onClick={download}
+                      className="px-6 py-3 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep hover:-translate-y-0.5 transition-all shadow-md shadow-teal/20 w-full sm:w-auto"
+                    >
+                      Download Image
+                    </button>
+
+                    <button
+                      onClick={reset}
+                      className="px-6 py-3 rounded-lg border border-border text-ink hover:bg-tealSoft/50 transition-colors w-full sm:w-auto"
+                    >
+                      Try another photo
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </section>
 
@@ -355,15 +413,17 @@ export default function Home() {
               title="Private by design"
               body="Your photo never leaves your device. There's no server upload, so there's nothing to store or leak."
             />
+
             <Feature
               icon="⚡"
               title="No account needed"
-              body="No sign-up, no email, no watermark. Drop a photo and get a transparent PNG back."
+              body="No sign-up, no email, no watermark. Drop a photo and get a transparent image back."
             />
+
             <Feature
               icon="✨"
-              title="Works on any photo"
-              body="Portraits, products, pets, logos, the model handles most subjects without manual masking."
+              title="Original image processing"
+              body="Your original image is processed without resizing or reducing its dimensions before processing."
             />
           </div>
 
@@ -371,15 +431,21 @@ export default function Home() {
             <h2 className="font-display text-2xl mb-4 text-ink">
               How to remove a background from a photo
             </h2>
+
             <ol className="space-y-3 text-inkSoft leading-relaxed list-decimal list-inside">
-              <li>Drag your photo into the box above, or click to choose a file.</li>
               <li>
-                Wait a few seconds while the tool identifies the subject and
-                removes everything behind it.
+                Drag your photo into the box above, or click to
+                choose a file.
               </li>
+
               <li>
-                Drag the slider to compare before and after, then download the
-                result as a transparent PNG.
+                Wait while the tool identifies the subject and removes
+                everything behind it.
+              </li>
+
+              <li>
+                Drag the slider to compare before and after, then
+                download the result.
               </li>
             </ol>
           </div>
@@ -388,27 +454,33 @@ export default function Home() {
             <h2 className="font-display text-2xl mb-4 text-ink">
               Frequently asked questions
             </h2>
+
             <div className="space-y-6">
               <FAQ
                 q="Is this actually free?"
                 a="Yes. There's no limit on how many images you can process, and no watermark on the result."
               />
+
               <FAQ
                 q="Where does the processing happen?"
-                a="Entirely in your browser, using a small on-device model. Your image is never sent to a server."
+                a="Entirely in your browser. Your image is never sent to a server."
               />
+
               <FAQ
                 q="What file formats are supported?"
-                a="You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG."
+                a="You can upload JPG, PNG, WebP, and other browser-supported image formats."
               />
+
               <FAQ
                 q="Is there a limit on image size?"
-                a="No hard limit. Large images are automatically resized before processing to keep things fast."
+                a="There is no application-level image dimension or file size limit. Very large images may still depend on your browser and device memory."
               />
+
               <FAQ
                 q="Does this work on mobile phones?"
-                a="Yes, BGCut works on any modern browser, including mobile Chrome and Safari. Processing time may be slightly longer on older phones."
+                a="Yes, BGCut works on modern browsers, including mobile Chrome and Safari. Large original images may take longer on mobile devices."
               />
+
               <FAQ
                 q="Can I use the result for commercial projects?"
                 a="Yes, the processed images are yours to use however you like, including commercial and business purposes."
@@ -417,14 +489,18 @@ export default function Home() {
           </div>
         </section>
 
-        <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
+        <div
+          className="max-w-5xl mx-auto px-6 pb-6"
+          id="ad-slot-bottom"
+        />
 
         <footer className="border-t border-border py-8">
           <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-inkSoft">
             <p>
-              BGCut, a free tool built with a browser-based ML model. No
-              images are stored or uploaded.
+              BGCut, a free tool built with a browser-based ML model.
+              No images are stored or uploaded.
             </p>
+
             <Link
               href="/blog"
               className="text-teal hover:underline whitespace-nowrap"
@@ -432,9 +508,13 @@ export default function Home() {
               Read our blog →
             </Link>
           </div>
+
           <div className="max-w-5xl mx-auto px-6 mt-6">
-            <a href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut" target="_blank" rel="noopener noreferrer">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+            <a
+              href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <img
                 src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1312515&theme=light"
                 alt="BGCut - Free background remover that runs 100% in your browser | Product Hunt"
@@ -462,17 +542,34 @@ function Feature({
   return (
     <div className="p-5 rounded-xl bg-card border border-border hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="text-2xl mb-2">{icon}</div>
-      <h3 className="font-medium text-ink mb-1.5">{title}</h3>
-      <p className="text-sm text-inkSoft leading-relaxed">{body}</p>
+
+      <h3 className="font-medium text-ink mb-1.5">
+        {title}
+      </h3>
+
+      <p className="text-sm text-inkSoft leading-relaxed">
+        {body}
+      </p>
     </div>
   );
 }
 
-function FAQ({ q, a }: { q: string; a: string }) {
+function FAQ({
+  q,
+  a,
+}: {
+  q: string;
+  a: string;
+}) {
   return (
     <div>
-      <p className="font-medium text-ink mb-1">{q}</p>
-      <p className="text-sm text-inkSoft leading-relaxed">{a}</p>
+      <p className="font-medium text-ink mb-1">
+        {q}
+      </p>
+
+      <p className="text-sm text-inkSoft leading-relaxed">
+        {a}
+      </p>
     </div>
   );
 }
@@ -493,6 +590,7 @@ function UploadIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
+
       <path
         d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
         strokeLinecap="round"
@@ -515,8 +613,17 @@ function ScissorsIcon() {
     >
       <circle cx="6" cy="6" r="2.5" />
       <circle cx="6" cy="18" r="2.5" />
-      <path d="M8.5 7.5L19 18" strokeLinecap="round" />
-      <path d="M8.5 16.5L19 6" strokeLinecap="round" />
+
+      <path
+        d="M8.5 7.5L19 18"
+        strokeLinecap="round"
+      />
+
+      <path
+        d="M8.5 16.5L19 6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
+```
