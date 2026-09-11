@@ -1,4 +1,3 @@
-```tsx
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -34,11 +33,8 @@ export default function Home() {
       return;
     }
 
-    // Clean up previous object URLs if needed
     setFileName(file.name.replace(/\.[^/.]+$/, ""));
 
-    // Use the ORIGINAL image directly
-    // No resizing or dimension limitation
     const localUrl = URL.createObjectURL(file);
 
     setOriginalUrl(localUrl);
@@ -58,27 +54,22 @@ export default function Home() {
       modelReady.current = true;
       setStatus("processing");
 
-      // Process original image without resizing
+      // ORIGINAL FILE DIRECTLY PROCESS HOGI
+      // KOI MAX DIMENSION / RESIZE LIMIT NAHI
       const blob = await removeBackground(file, {
         publicPath:
           "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
-
         model: "isnet_quint8",
-
-        // GPU processing when supported
         device: "gpu",
-
         output: {
           quality: 0.7,
           format: "image/webp",
         },
-
         progress: (key, current, total) => {
           if (total > 0) {
             const pct = Math.round(
               (current / total) * 100
             );
-
             setProgress(pct);
           }
         },
@@ -92,9 +83,8 @@ export default function Home() {
       console.error(err);
 
       setStatus("error");
-
       setErrorMsg(
-        "Couldn't process that image. Please try a different image or make sure your device has enough memory."
+        "Couldn't process that image. Try a different image or a device with more available memory."
       );
     }
   }, []);
@@ -102,14 +92,11 @@ export default function Home() {
   const onDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
-
       setIsDragging(false);
 
       const file = e.dataTransfer.files?.[0];
 
-      if (file) {
-        processFile(file);
-      }
+      if (file) processFile(file);
     },
     [processFile]
   );
@@ -118,9 +105,7 @@ export default function Home() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
 
-      if (file) {
-        processFile(file);
-      }
+      if (file) processFile(file);
     },
     [processFile]
   );
@@ -132,7 +117,6 @@ export default function Home() {
     setErrorMsg("");
     setProgress(0);
 
-    // Allow selecting the same file again
     if (inputRef.current) {
       inputRef.current.value = "";
     }
@@ -142,13 +126,8 @@ export default function Home() {
     if (!resultUrl) return;
 
     const a = document.createElement("a");
-
     a.href = resultUrl;
-
-    // Keeping original behavior
-    // Output is WebP because removeBackground returns WebP
     a.download = `${fileName}-no-bg.webp`;
-
     a.click();
   };
 
@@ -188,10 +167,7 @@ export default function Home() {
           </div>
         </header>
 
-        <div
-          className="max-w-5xl mx-auto px-6 pt-2"
-          id="ad-slot-top"
-        />
+        <div className="max-w-5xl mx-auto px-6 pt-2" id="ad-slot-top" />
 
         <section className="max-w-5xl mx-auto px-6 pt-4 pb-16">
           <div className="max-w-2xl mb-4">
@@ -208,9 +184,9 @@ export default function Home() {
             </h1>
 
             <p className="text-inkSoft text-sm leading-relaxed">
-              Drop a photo below. Nothing gets uploaded to a server,
-              the whole thing runs locally on your device, so it is
-              private and instant.
+              Drop a photo below. Nothing gets uploaded to a server, the
+              whole thing runs locally on your device, so it is private and
+              instant.
             </p>
           </div>
 
@@ -247,13 +223,12 @@ export default function Home() {
                 </p>
 
                 <p className="mt-1 text-sm text-inkSoft">
-                  JPG, PNG, or WebP • Original size supported
+                  JPG, PNG, or WebP, processed entirely on your device
                 </p>
               </div>
             )}
 
-            {(status === "loading-model" ||
-              status === "processing") && (
+            {(status === "loading-model" || status === "processing") && (
               <div className="py-16 flex flex-col items-center justify-center text-center pop-in">
                 <div className="relative w-20 h-20 mb-6">
                   {originalUrl && (
@@ -278,7 +253,7 @@ export default function Home() {
                 </p>
 
                 <p className="mt-1.5 text-sm text-inkSoft mb-6">
-                  Processing the original image on your device.
+                  This happens on your device, not on a server.
                 </p>
 
                 <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
@@ -317,88 +292,86 @@ export default function Home() {
               </div>
             )}
 
-            {status === "done" &&
-              originalUrl &&
-              resultUrl && (
-                <div className="pop-in">
+            {status === "done" && originalUrl && resultUrl && (
+              <div className="pop-in">
+                <div
+                  className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
+                  style={{ maxWidth: 560 }}
+                >
                   <div
-                    className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
-                    style={{ maxWidth: 560 }}
+                    className="relative w-full"
+                    style={{ aspectRatio: "4/3" }}
                   >
+                    <img
+                      src={resultUrl}
+                      alt="Background removed"
+                      className="absolute inset-0 w-full h-full object-contain"
+                      style={{
+                        clipPath: `inset(0 ${
+                          100 - sliderPos
+                        }% 0 0)`,
+                      }}
+                    />
+
+                    <img
+                      src={originalUrl}
+                      alt="Original"
+                      className="absolute inset-0 w-full h-full object-contain"
+                      style={{
+                        clipPath: `inset(0 0 0 ${sliderPos}%)`,
+                      }}
+                    />
+
                     <div
-                      className="relative w-full"
-                      style={{ aspectRatio: "4/3" }}
+                      className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
+                      style={{
+                        left: `${sliderPos}%`,
+                      }}
                     >
-                      <img
-                        src={resultUrl}
-                        alt="Background removed"
-                        className="absolute inset-0 w-full h-full object-contain"
-                        style={{
-                          clipPath: `inset(0 ${
-                            100 - sliderPos
-                          }% 0 0)`,
-                        }}
-                      />
-
-                      <img
-                        src={originalUrl}
-                        alt="Original"
-                        className="absolute inset-0 w-full h-full object-contain"
-                        style={{
-                          clipPath: `inset(0 0 0 ${sliderPos}%)`,
-                        }}
-                      />
-
-                      <div
-                        className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
-                        style={{
-                          left: `${sliderPos}%`,
-                        }}
-                      >
-                        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
-                          ↔
-                        </div>
+                      <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
+                        ↔
                       </div>
-
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-teal shadow">
-                        After
-                      </span>
-
-                      <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-inkSoft shadow">
-                        Before
-                      </span>
                     </div>
 
-                    <input
-                      type="range"
-                      min={0}
-                      max={100}
-                      value={sliderPos}
-                      onChange={(e) =>
-                        setSliderPos(Number(e.target.value))
-                      }
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
-                      aria-label="Compare original and result"
-                    />
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-teal shadow">
+                      After
+                    </span>
+
+                    <span className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-white/90 text-xs font-medium text-inkSoft shadow">
+                      Before
+                    </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
-                    <button
-                      onClick={download}
-                      className="px-6 py-3 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep hover:-translate-y-0.5 transition-all shadow-md shadow-teal/20 w-full sm:w-auto"
-                    >
-                      Download Image
-                    </button>
-
-                    <button
-                      onClick={reset}
-                      className="px-6 py-3 rounded-lg border border-border text-ink hover:bg-tealSoft/50 transition-colors w-full sm:w-auto"
-                    >
-                      Try another photo
-                    </button>
-                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={sliderPos}
+                    onChange={(e) =>
+                      setSliderPos(Number(e.target.value))
+                    }
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
+                    aria-label="Compare original and result"
+                  />
                 </div>
-              )}
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-6">
+                  <button
+                    onClick={download}
+                    className="px-6 py-3 rounded-lg bg-teal text-white font-medium hover:bg-tealDeep hover:-translate-y-0.5 transition-all shadow-md shadow-teal/20 w-full sm:w-auto"
+                  >
+                    Download PNG
+                  </button>
+
+                  <button
+                    onClick={reset}
+                    className="px-6 py-3 rounded-lg border border-border text-ink hover:bg-tealSoft/50 transition-colors w-full sm:w-auto"
+                  >
+                    Try another photo
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -417,13 +390,13 @@ export default function Home() {
             <Feature
               icon="⚡"
               title="No account needed"
-              body="No sign-up, no email, no watermark. Drop a photo and get a transparent image back."
+              body="No sign-up, no email, no watermark. Drop a photo and get a transparent PNG back."
             />
 
             <Feature
               icon="✨"
-              title="Original image processing"
-              body="Your original image is processed without resizing or reducing its dimensions before processing."
+              title="Works on any photo"
+              body="Portraits, products, pets, logos, the model handles most subjects without manual masking."
             />
           </div>
 
@@ -434,18 +407,17 @@ export default function Home() {
 
             <ol className="space-y-3 text-inkSoft leading-relaxed list-decimal list-inside">
               <li>
-                Drag your photo into the box above, or click to
-                choose a file.
+                Drag your photo into the box above, or click to choose a file.
               </li>
 
               <li>
-                Wait while the tool identifies the subject and removes
-                everything behind it.
+                Wait a few seconds while the tool identifies the subject and
+                removes everything behind it.
               </li>
 
               <li>
-                Drag the slider to compare before and after, then
-                download the result.
+                Drag the slider to compare before and after, then download the
+                result as a transparent image.
               </li>
             </ol>
           </div>
@@ -463,22 +435,22 @@ export default function Home() {
 
               <FAQ
                 q="Where does the processing happen?"
-                a="Entirely in your browser. Your image is never sent to a server."
+                a="Entirely in your browser, using a small on-device model. Your image is never sent to a server."
               />
 
               <FAQ
                 q="What file formats are supported?"
-                a="You can upload JPG, PNG, WebP, and other browser-supported image formats."
+                a="You can upload JPG, PNG, or WebP."
               />
 
               <FAQ
                 q="Is there a limit on image size?"
-                a="There is no application-level image dimension or file size limit. Very large images may still depend on your browser and device memory."
+                a="There is no application-level size or dimension limit. Very large images may require more device memory and processing power."
               />
 
               <FAQ
                 q="Does this work on mobile phones?"
-                a="Yes, BGCut works on modern browsers, including mobile Chrome and Safari. Large original images may take longer on mobile devices."
+                a="Yes, BGCut works on any modern browser, including mobile Chrome and Safari. Processing time may be slightly longer on older phones."
               />
 
               <FAQ
@@ -497,8 +469,8 @@ export default function Home() {
         <footer className="border-t border-border py-8">
           <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-inkSoft">
             <p>
-              BGCut, a free tool built with a browser-based ML model.
-              No images are stored or uploaded.
+              BGCut, a free tool built with a browser-based ML model. No
+              images are stored or uploaded.
             </p>
 
             <Link
@@ -554,18 +526,10 @@ function Feature({
   );
 }
 
-function FAQ({
-  q,
-  a,
-}: {
-  q: string;
-  a: string;
-}) {
+function FAQ({ q, a }: { q: string; a: string }) {
   return (
     <div>
-      <p className="font-medium text-ink mb-1">
-        {q}
-      </p>
+      <p className="font-medium text-ink mb-1">{q}</p>
 
       <p className="text-sm text-inkSoft leading-relaxed">
         {a}
@@ -626,4 +590,3 @@ function ScissorsIcon() {
     </svg>
   );
 }
-```
