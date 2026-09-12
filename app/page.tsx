@@ -36,7 +36,6 @@ export default function Home() {
     });
   }, []);
 
-  // Rotate a tip every few seconds while the user waits
   useEffect(() => {
     if (status !== "loading-model" && status !== "processing") return;
     const interval = setInterval(() => {
@@ -139,7 +138,7 @@ export default function Home() {
 
     const a = document.createElement("a");
     a.href = resultUrl;
-    a.download = `${fileName}-no-bg.png`;
+    a.download = fileName + "-no-bg.png";
     a.click();
   };
 
@@ -209,11 +208,12 @@ export default function Home() {
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={onDrop}
                 onClick={() => inputRef.current?.click()}
-                className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center text-center py-9 px-6 ${
-                  isDragging
+                className={
+                  "relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-200 flex flex-col items-center justify-center text-center py-9 px-6 " +
+                  (isDragging
                     ? "border-teal bg-tealSoft scale-[1.01]"
-                    : "border-border hover:border-teal/50 hover:bg-tealSoft/40"
-                }`}
+                    : "border-border hover:border-teal/50 hover:bg-tealSoft/40")
+                }
               >
                 <input
                   ref={inputRef}
@@ -262,18 +262,15 @@ export default function Home() {
                 </p>
 
                 <div className="mt-4 mb-6 h-10 flex items-center justify-center max-w-sm">
-                  <p
-                    key={tipIndex}
-                    className="text-sm text-inkSoft fade-up"
-                  >
-                    💡 {TIPS[tipIndex]}
+                  <p key={tipIndex} className="text-sm text-inkSoft fade-up">
+                    Tip: {TIPS[tipIndex]}
                   </p>
                 </div>
 
                 <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
                   <div
                     className="absolute inset-y-0 left-0 rounded-full bg-teal transition-all duration-200"
-                    style={{ width: `${Math.max(progress, 8)}%` }}
+                    style={{ width: Math.max(progress, 8) + "%" }}
                   />
                 </div>
 
@@ -311,19 +308,19 @@ export default function Home() {
                       src={resultUrl}
                       alt="Background removed"
                       className="absolute inset-0 w-full h-full object-contain"
-                      style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+                      style={{ clipPath: "inset(0 " + (100 - sliderPos) + "% 0 0)" }}
                     />
 
                     <img
                       src={originalUrl}
                       alt="Original"
                       className="absolute inset-0 w-full h-full object-contain"
-                      style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
+                      style={{ clipPath: "inset(0 0 0 " + sliderPos + "%)" }}
                     />
 
                     <div
                       className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
-                      style={{ left: `${sliderPos}%` }}
+                      style={{ left: sliderPos + "%" }}
                     >
                       <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
                         ↔
@@ -465,12 +462,12 @@ export default function Home() {
               href="/blog"
               className="text-teal hover:underline whitespace-nowrap"
             >
-              Read our blog →
+              Read our blog
             </Link>
           </div>
 
           <div className="max-w-5xl mx-auto px-6 mt-6">
-            
+            <a
               href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut"
               target="_blank"
               rel="noopener noreferrer"
