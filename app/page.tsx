@@ -7,6 +7,15 @@ import Logo from "./Logo";
 
 type Status = "idle" | "loading-model" | "processing" | "done" | "error";
 
+const TIPS = [
+  "Good lighting on the subject makes for a cleaner cutout.",
+  "Works great on portraits, products, pets, and logos.",
+  "Your photo never leaves your device during this.",
+  "Fine details like hair take a little longer to get right.",
+  "The result downloads as a transparent PNG, ready to use anywhere.",
+  "First image is slower since the model is loading, next ones are quicker.",
+];
+
 export default function Home() {
   const [status, setStatus] = useState<Status>("idle");
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
@@ -16,6 +25,7 @@ export default function Home() {
   const [errorMsg, setErrorMsg] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [tipIndex, setTipIndex] = useState(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const modelReady = useRef(false);
@@ -25,6 +35,15 @@ export default function Home() {
       modelReady.current = true;
     });
   }, []);
+
+  // Rotate a tip every few seconds while the user waits
+  useEffect(() => {
+    if (status !== "loading-model" && status !== "processing") return;
+    const interval = setInterval(() => {
+      setTipIndex((i) => (i + 1) % TIPS.length);
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [status]);
 
   const processFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -41,35 +60,28 @@ export default function Home() {
     setResultUrl(null);
     setErrorMsg("");
     setProgress(0);
+    setTipIndex(0);
 
-    setStatus(
-      modelReady.current ? "processing" : "loading-model"
-    );
+    setStatus(modelReady.current ? "processing" : "loading-model");
 
     try {
-      const { removeBackground } = await import(
-        "@imgly/background-removal"
-      );
+      const { removeBackground } = await import("@imgly/background-removal");
 
       modelReady.current = true;
       setStatus("processing");
 
-      // ORIGINAL FILE DIRECTLY PROCESS HOGI
-      // KOI MAX DIMENSION / RESIZE LIMIT NAHI
       const blob = await removeBackground(file, {
         publicPath:
           "https://staticimgly.com/@imgly/background-removal-data/1.6.0/dist/",
-        model: "isnet_quint8",
+        model: "isnet_fp16",
         device: "gpu",
         output: {
-          quality: 0.7,
-          format: "image/webp",
+          quality: 0.92,
+          format: "image/png",
         },
         progress: (key, current, total) => {
           if (total > 0) {
-            const pct = Math.round(
-              (current / total) * 100
-            );
+            const pct = Math.round((current / total) * 100);
             setProgress(pct);
           }
         },
@@ -127,7 +139,7 @@ export default function Home() {
 
     const a = document.createElement("a");
     a.href = resultUrl;
-    a.download = `${fileName}-no-bg.webp`;
+    a.download = `${fileName}-no-bg.png`;
     a.click();
   };
 
@@ -177,10 +189,7 @@ export default function Home() {
 
             <h1 className="font-display text-2xl sm:text-3xl leading-[1.15] mb-2 text-ink">
               Cut the background out of any photo,{" "}
-              <span className="text-teal">
-                right in your browser
-              </span>
-              .
+              <span className="text-teal">right in your browser</span>.
             </h1>
 
             <p className="text-inkSoft text-sm leading-relaxed">
@@ -252,23 +261,24 @@ export default function Home() {
                     : "Lifting the subject off the background"}
                 </p>
 
-                <p className="mt-1.5 text-sm text-inkSoft mb-6">
-                  This happens on your device, not on a server.
-                </p>
+                <div className="mt-4 mb-6 h-10 flex items-center justify-center max-w-sm">
+                  <p
+                    key={tipIndex}
+                    className="text-sm text-inkSoft fade-up"
+                  >
+                    💡 {TIPS[tipIndex]}
+                  </p>
+                </div>
 
                 <div className="w-64 h-2 rounded-full bg-tealSoft overflow-hidden relative">
                   <div
                     className="absolute inset-y-0 left-0 rounded-full bg-teal transition-all duration-200"
-                    style={{
-                      width: `${Math.max(progress, 8)}%`,
-                    }}
+                    style={{ width: `${Math.max(progress, 8)}%` }}
                   />
                 </div>
 
                 {progress > 0 && (
-                  <p className="text-xs text-inkSoft mt-2">
-                    {progress}%
-                  </p>
+                  <p className="text-xs text-inkSoft mt-2">{progress}%</p>
                 )}
               </div>
             )}
@@ -279,9 +289,7 @@ export default function Home() {
                   <span className="text-2xl">!</span>
                 </div>
 
-                <p className="font-medium text-ink mb-2">
-                  {errorMsg}
-                </p>
+                <p className="font-medium text-ink mb-2">{errorMsg}</p>
 
                 <button
                   onClick={reset}
@@ -298,35 +306,24 @@ export default function Home() {
                   className="checkerboard relative rounded-xl overflow-hidden select-none mx-auto border border-border"
                   style={{ maxWidth: 560 }}
                 >
-                  <div
-                    className="relative w-full"
-                    style={{ aspectRatio: "4/3" }}
-                  >
+                  <div className="relative w-full" style={{ aspectRatio: "4/3" }}>
                     <img
                       src={resultUrl}
                       alt="Background removed"
                       className="absolute inset-0 w-full h-full object-contain"
-                      style={{
-                        clipPath: `inset(0 ${
-                          100 - sliderPos
-                        }% 0 0)`,
-                      }}
+                      style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
                     />
 
                     <img
                       src={originalUrl}
                       alt="Original"
                       className="absolute inset-0 w-full h-full object-contain"
-                      style={{
-                        clipPath: `inset(0 0 0 ${sliderPos}%)`,
-                      }}
+                      style={{ clipPath: `inset(0 0 0 ${sliderPos}%)` }}
                     />
 
                     <div
                       className="absolute inset-y-0 w-0.5 bg-white shadow-lg"
-                      style={{
-                        left: `${sliderPos}%`,
-                      }}
+                      style={{ left: `${sliderPos}%` }}
                     >
                       <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 rounded-full bg-white shadow-lg flex items-center justify-center text-teal text-sm font-bold">
                         ↔
@@ -347,9 +344,7 @@ export default function Home() {
                     min={0}
                     max={100}
                     value={sliderPos}
-                    onChange={(e) =>
-                      setSliderPos(Number(e.target.value))
-                    }
+                    onChange={(e) => setSliderPos(Number(e.target.value))}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize"
                     aria-label="Compare original and result"
                   />
@@ -406,15 +401,11 @@ export default function Home() {
             </h2>
 
             <ol className="space-y-3 text-inkSoft leading-relaxed list-decimal list-inside">
-              <li>
-                Drag your photo into the box above, or click to choose a file.
-              </li>
-
+              <li>Drag your photo into the box above, or click to choose a file.</li>
               <li>
                 Wait a few seconds while the tool identifies the subject and
                 removes everything behind it.
               </li>
-
               <li>
                 Drag the slider to compare before and after, then download the
                 result as a transparent image.
@@ -440,7 +431,7 @@ export default function Home() {
 
               <FAQ
                 q="What file formats are supported?"
-                a="You can upload JPG, PNG, or WebP."
+                a="You can upload JPG, PNG, or WebP. The result always downloads as a transparent PNG."
               />
 
               <FAQ
@@ -461,10 +452,7 @@ export default function Home() {
           </div>
         </section>
 
-        <div
-          className="max-w-5xl mx-auto px-6 pb-6"
-          id="ad-slot-bottom"
-        />
+        <div className="max-w-5xl mx-auto px-6 pb-6" id="ad-slot-bottom" />
 
         <footer className="border-t border-border py-8">
           <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-sm text-inkSoft">
@@ -482,7 +470,7 @@ export default function Home() {
           </div>
 
           <div className="max-w-5xl mx-auto px-6 mt-6">
-            <a
+            
               href="https://www.producthunt.com/products/bgcut/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-bgcut"
               target="_blank"
               rel="noopener noreferrer"
@@ -515,13 +503,9 @@ function Feature({
     <div className="p-5 rounded-xl bg-card border border-border hover:shadow-md hover:-translate-y-0.5 transition-all">
       <div className="text-2xl mb-2">{icon}</div>
 
-      <h3 className="font-medium text-ink mb-1.5">
-        {title}
-      </h3>
+      <h3 className="font-medium text-ink mb-1.5">{title}</h3>
 
-      <p className="text-sm text-inkSoft leading-relaxed">
-        {body}
-      </p>
+      <p className="text-sm text-inkSoft leading-relaxed">{body}</p>
     </div>
   );
 }
@@ -531,9 +515,7 @@ function FAQ({ q, a }: { q: string; a: string }) {
     <div>
       <p className="font-medium text-ink mb-1">{q}</p>
 
-      <p className="text-sm text-inkSoft leading-relaxed">
-        {a}
-      </p>
+      <p className="text-sm text-inkSoft leading-relaxed">{a}</p>
     </div>
   );
 }
@@ -578,15 +560,9 @@ function ScissorsIcon() {
       <circle cx="6" cy="6" r="2.5" />
       <circle cx="6" cy="18" r="2.5" />
 
-      <path
-        d="M8.5 7.5L19 18"
-        strokeLinecap="round"
-      />
+      <path d="M8.5 7.5L19 18" strokeLinecap="round" />
 
-      <path
-        d="M8.5 16.5L19 6"
-        strokeLinecap="round"
-      />
+      <path d="M8.5 16.5L19 6" strokeLinecap="round" />
     </svg>
   );
 }
